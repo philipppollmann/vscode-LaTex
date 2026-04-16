@@ -1,0 +1,6 @@
+out/
+node_modules/
+*.vsix
+# PDF.js files are copied from node_modules at install time
+media/pdf.min.js
+media/pdf.worker.min.js

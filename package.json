@@ -1,0 +1,96 @@
+{
+  "name": "vscode-latex",
+  "displayName": "LaTeX Live Preview",
+  "description": "Live PDF preview and auto-compile for LaTeX – like Overleaf inside VS Code",
+  "version": "0.1.0",
+  "publisher": "philippgeuer-pollmann",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Other"],
+  "activationEvents": [
+    "onLanguage:latex",
+    "workspaceContains:**/*.tex"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "latex.compile",
+        "title": "LaTeX: Compile"
+      },
+      {
+        "command": "latex.showPreview",
+        "title": "LaTeX: Show PDF Preview"
+      },
+      {
+        "command": "latex.setMainFile",
+        "title": "LaTeX: Set Main File"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "latex.compile",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "editorLangId == latex"
+      },
+      {
+        "command": "latex.showPreview",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+alt+p"
+      }
+    ],
+    "configuration": {
+      "title": "LaTeX",
+      "properties": {
+        "latex.mainFile": {
+          "type": "string",
+          "default": "",
+          "description": "Relative path (from workspace root) to the main .tex file to compile. Leave empty to use the active editor."
+        },
+        "latex.outputDir": {
+          "type": "string",
+          "default": "out",
+          "description": "Output directory for compiled files, relative to workspace root."
+        },
+        "latex.latexmkPath": {
+          "type": "string",
+          "default": "/Library/TeX/texbin/latexmk",
+          "description": "Absolute path to the latexmk executable."
+        },
+        "latex.extraArgs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Extra arguments passed to latexmk (e.g. [\"-shell-escape\"])."
+        },
+        "latex.autoCompile": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically compile on save."
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "latex",
+        "extensions": [".tex", ".sty", ".cls"],
+        "aliases": ["LaTeX", "latex"]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "node scripts/copy-pdfjs.js && npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node scripts/copy-pdfjs.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "pdfjs-dist": "3.11.174"
+  }
+}
