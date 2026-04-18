@@ -2,9 +2,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { LatexCompiler, CompilationStatus } from './latexCompiler';
 import { PdfPreviewPanel } from './pdfPreview';
+import { LatexSidebarProvider } from './latexSidebarProvider';
 
 let compiler: LatexCompiler;
 let statusBarItem: vscode.StatusBarItem;
+let sidebarProvider: LatexSidebarProvider;
 
 /** Explicitly set main file (overrides active-editor fallback). */
 let configuredMainFile: string | undefined;
@@ -22,6 +24,22 @@ export function activate(context: vscode.ExtensionContext): void {
   statusBarItem.show();
 
   compiler.onStatusChange((status) => setStatusBar(status), null, context.subscriptions);
+
+  // ── Sidebar ──────────────────────────────────────────────────────────────
+
+  sidebarProvider = new LatexSidebarProvider();
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('latexView', sidebarProvider)
+  );
+
+  // Refresh sidebar when latex settings change
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('latex')) {
+        sidebarProvider.refresh();
+      }
+    })
+  );
 
   // ── Commands ────────────────────────────────────────────────────────────
 
@@ -86,12 +104,28 @@ export function activate(context: vscode.ExtensionContext): void {
       );
 
       vscode.window.showInformationMessage(`LaTeX main file: ${picked.label}`);
+      sidebarProvider.refresh();
 
       // Immediately compile and open the preview
       const pdfPath = await compiler.compile(configuredMainFile);
       if (pdfPath) {
         PdfPreviewPanel.createOrShow(context, pdfPath);
       }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('latex.toggleAutoCompile', async () => {
+      const cfg = vscode.workspace.getConfiguration('latex');
+      const current = cfg.get<boolean>('autoCompile', true);
+      await cfg.update('autoCompile', !current, vscode.ConfigurationTarget.Workspace);
+      sidebarProvider.refresh();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('latex.refreshSidebar', () => {
+      sidebarProvider.refresh();
     })
   );
 

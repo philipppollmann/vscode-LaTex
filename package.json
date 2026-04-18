@@ -3,7 +3,7 @@
   "displayName": "LaTeX Live Preview",
   "description": "Live PDF preview and auto-compile for LaTeX – like Overleaf inside VS Code",
   "version": "0.1.0",
-  "publisher": "philippgeuer-pollmann",
+  "publisher": "philipppollmann",
   "license": "MIT",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Programming Languages", "Other"],
@@ -13,20 +13,67 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "latex-sidebar",
+          "title": "LaTeX",
+          "icon": "media/latex-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "latex-sidebar": [
+        {
+          "id": "latexView",
+          "name": "LaTeX"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "latex.compile",
-        "title": "LaTeX: Compile"
+        "title": "LaTeX: Compile",
+        "icon": "$(play)"
       },
       {
         "command": "latex.showPreview",
-        "title": "LaTeX: Show PDF Preview"
+        "title": "LaTeX: Show PDF Preview",
+        "icon": "$(open-preview)"
       },
       {
         "command": "latex.setMainFile",
         "title": "LaTeX: Set Main File"
+      },
+      {
+        "command": "latex.toggleAutoCompile",
+        "title": "LaTeX: Toggle Auto-Compile"
+      },
+      {
+        "command": "latex.refreshSidebar",
+        "title": "Refresh",
+        "icon": "$(refresh)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "latex.compile",
+          "when": "view == latexView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "latex.showPreview",
+          "when": "view == latexView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "latex.refreshSidebar",
+          "when": "view == latexView",
+          "group": "navigation@3"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "latex.compile",
